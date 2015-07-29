@@ -2,21 +2,30 @@ require_relative 'ship'
 
 class Board
 
-  attr_reader :board
+  attr_reader :placed_ships
 
   def initialize
-    @board = []
+    @placed_ships = {}
   end
 
-  def place(ship, initial_position)
-    @board << ship
+  def place(ship, positions)
+    placed_ships[positions] = ship
   end
 
   def empty?
-    @board.empty?
+    placed_ships.empty?
   end
 
   def fire(coord)
+    placed_ships.include?(coord) ? hit(coord) : "Miss"
+  end
 
+  def coords_already_hit
+
+  end
+
+  def hit(coord)
+    placed_ships[coord].lose_hp
+    'Hit'
   end
 end

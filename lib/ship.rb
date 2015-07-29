@@ -7,4 +7,8 @@ class Ship
     @size = size
     @hp = size
   end
+
+  def lose_hp
+    @hp -= 1
+  end
 end
