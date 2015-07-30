@@ -10,7 +10,7 @@ class Ship
     @hits += 1
   end
 
-  def alive?
-    @hits < size
+  def sunk?
+    @hits >= size
   end
 end
