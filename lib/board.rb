@@ -4,11 +4,16 @@ class Board
 
   attr_reader :placed_ships
   attr_reader :coords_not_available
+  attr_reader :ships_on_board
+  attr_reader :number_of_hits
 
   def initialize
     @placed_ships = {}
     @prev_targets = []
     @coords_not_available = []
+    @ships_on_board = []
+    @number_of_hits = 0
+    @number_of_misses = 0
   end
 
   def place(ship, coords, direction)
@@ -18,6 +23,7 @@ class Board
     get_coords(ship, coords, direction).each do |coord|
       placed_ships[coord] = ship
     end
+    @ships_on_board << ship
   end
 
   def get_coords(ship, coord, direction)
@@ -53,12 +59,27 @@ class Board
   def fire(coord)
     fail 'Already fired on' if coords_already_hit?(coord)
     @prev_targets << coord
-    placed_ships.include?(coord) ? hit(coord) : 'Miss'
+    placed_ships.include?(coord) ? hit(coord) : miss
+  end
+
+  def miss
+    @number_of_misses += 1
+    'Miss'
   end
 
   def hit(coord)
+    @number_of_hits += 1
     placed_ships[coord].hit
-    placed_ships[coord].sunk? ? 'Ship sunk' : 'Hit'
+    placed_ships[coord].sunk? ? sunk_ship(placed_ships[coord]) : 'Hit'
+  end
+
+  def sunk_ship(ship)
+    @ships_on_board.delete(ship)
+    'Ship sunk'
+  end
+
+  def victory?
+    @number_of_hits > 0 && @ships_on_board.empty?
   end
 
   def coords_already_hit?(coord)

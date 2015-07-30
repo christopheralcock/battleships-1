@@ -7,6 +7,8 @@ describe Board do
   before { allow(ship1).to receive(:size).and_return(1) }
   before { allow(ship3).to receive(:sunk?) }
   before { allow(ship1).to receive(:sunk?) }
+  before { allow(ship3).to receive(:hit) }
+  before { allow(ship1).to receive(:hit) }
 
   it 'places a ship' do
     subject.place ship3, :a3, :horizontal
@@ -18,13 +20,11 @@ describe Board do
   end
 
   it 'registers hits' do
-    allow(ship3).to receive(:hit)
     subject.place ship3, :a3, :horizontal
     expect(subject.fire :a3).to eq 'Hit'
   end
 
   it "won't allow hits on same spot twice" do
-    allow(ship3).to receive(:hit)
     subject.place ship3, :a3, :horizontal
     subject.fire :a3
     expect { subject.fire :a3 }.to raise_error ('Already fired on')
@@ -49,9 +49,19 @@ describe Board do
   end
 
   it 'says you\'ve sunk a ship' do
-    allow(ship1).to receive(:hit)
     subject.place ship1, :a1, :horizontal
     expect(ship1).to receive(:sunk?)
     subject.fire :a1
+  end
+
+  it 'know game is not over before starting' do
+    expect(subject.victory?).to eq false
+  end
+
+  it 'know game is over if all ships have sunk' do
+    subject.place ship1, :a1, :horizontal
+    allow(ship1).to receive(:sunk?).and_return(true)
+    subject.fire :a1
+    expect(subject.victory?).to eq true
   end
 end
