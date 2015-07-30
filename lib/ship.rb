@@ -1,7 +1,6 @@
 class Ship
 
   attr_reader :size
-  # attr_accessor :hp
 
   def initialize(size)
     @size, @hits = size, 0
@@ -14,5 +13,4 @@ class Ship
   def alive?
     @hits < size
   end
-
 end

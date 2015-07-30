@@ -9,26 +9,22 @@ class Board
     @prev_targets = []
   end
 
-  def place(ship, positions)
-    raise "NO WAY! You're off the freaking grid!!!!" unless coord_on_board?(positions)
-    placed_ships[positions] = ship
+  def place(ship, size, coords, direction)
+    fail 'Off Grid' unless coord_on_board?(coords, direction)
+    get_coords(coords, size, direction).each do |xy|
+     placed_ships[xy] = ship
+   end
     @placed_ships
   end
 
-  def coord_on_board?(positions)
-    ((positions[0] <= 'j') && (positions[1..-1].to_i <= 10))
-    # number.to_i <= 10 ? true : false
-  end
-
-
-  def empty?
-    placed_ships.empty?
+  def coord_on_board?(coords, direction)
+    ((coords[0] <= 'j') && (coords[1..-1].to_i <= 10))
   end
 
   def fire(coord)
-    raise "Already fired on" if coords_already_hit?(coord)
-    @prev_targets<<coord
-    placed_ships.include?(coord) ? hit(coord) : "Miss"
+    fail 'Already fired on' if coords_already_hit?(coord)
+    @prev_targets << coord
+    placed_ships.include?(coord) ? hit(coord) : 'Miss'
   end
 
   def coords_already_hit?(coord)
@@ -40,39 +36,24 @@ class Board
     'Hit'
   end
 
-  def all_coords(starting_point, direction)
-    (horizontal_coords(starting_point.split(0), direction) + next_number(starting_point.split(-1), direction).to_s).to_sym
+  def get_coords(coord, size, direction)
+   coords = [coord]
+   (size - 1).times { coords << (direction == :horizontal ? next_horizontal(coords.last) : next_vertical(coords.last)) }
+   coords
   end
 
-  def horizontal_coords letter, size, direction
-    return letter unless [:W, :E].include? direction
-    size.times { direction == :W ?
-
-      x = prev_char(letter)
-      letter = x
-
-
-      : letter.next }
-
-    # directon == :W ? prev_char(letter) : letter.next!
+  def next_horizontal(coords)
+    coords.to_s.reverse.next.reverse.to_sym
   end
 
-  def next_number number, direction
-    return number unless [:N, :S].include? direction
-    direction == :N ? number.to_i - 1 : number.to_i + 1
+  def next_vertical(coords)
+    x, y = coords.to_s.split('', 2)
+    (x + y.next).to_sym
   end
 
-  def prev_char(char)
-    (char.to_s.chr.ord - 1).chr
+  private
+
+  def empty?
+    placed_ships.empty?
   end
-
-  def get_letter(coord)
-    coord.slice(0)
-  end
-
-  def get_number(coord)
-    coord.slice(/\d+/).to_i
-  end
-
-
 end
