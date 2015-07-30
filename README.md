@@ -54,3 +54,5 @@ Ships | placeable, directions, sizes, be hit or miss, cannot overlap
 Authors :
 * Zhou
 * Gaby
+* Retesh
+* Chris
