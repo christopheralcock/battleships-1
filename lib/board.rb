@@ -7,14 +7,20 @@ class Board
   def initialize
     @placed_ships = {}
     @prev_targets = []
+    # @coords_not_available = []
   end
 
-  def place(ship, size, coords, direction)
-    fail 'Coordinates already occupied' if coords_in_use?(coords)
-    fail 'Off Grid' unless coord_on_board?(coords, size, direction)
-    get_coords(coords, size, direction).each do |xy|
-     placed_ships[xy] = ship
-   end
+  def place(ship, coords, direction)
+    fail 'Off Grid' unless coord_on_board?(ship, coords, direction)
+    get_coords(ship, coords, direction).each do |xy|
+      if coords_in_use?(coords)
+        placed_ships = placed_ships.invert.delete(ship)
+        fail 'Coordinates already occupied'
+      else
+        placed_ships[xy] = ship
+      end
+      # @coords_not_available << xy
+    end
     @placed_ships
   end
 
@@ -22,8 +28,8 @@ class Board
     placed_ships[coords] != nil
   end
 
-  def coord_on_board?(coords, size, direction)
-    coord = get_coords(coords, size, direction).last
+  def coord_on_board?(ship, coords, direction)
+    coord = get_coords(ship.size, coords, direction).last
     ((coord[0] <= 'j') && (coord[1..-1].to_i <= 10))
 
   end
@@ -43,9 +49,9 @@ class Board
     'Hit'
   end
 
-  def get_coords(coord, size, direction)
+  def get_coords(ship, coord, direction)
    coords = [coord]
-   (size - 1).times { coords << (direction == :horizontal ? next_horizontal(coords.last) : next_vertical(coords.last)) }
+   (ship.size - 1).times { coords << (direction == :horizontal ? next_horizontal(coords.last) : next_vertical(coords.last)) }
    coords
   end
 
