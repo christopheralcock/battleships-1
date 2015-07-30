@@ -29,4 +29,10 @@ describe Board do
   it 'gets the next horizontal coords' do
     expect(subject.get_coords(:a1, 2, :horizontal)).to eq [:a1, :b1]
   end
+
+  it "won't allow a ship to be overwritten" do
+    subject.place ship, 1, :a1, :horizontal
+    expect { subject.place ship, 1, :a1, :horizontal }.to raise_error ('Coordinates already occupied')
+  end
+
 end

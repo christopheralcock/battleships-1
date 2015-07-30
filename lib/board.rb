@@ -10,15 +10,22 @@ class Board
   end
 
   def place(ship, size, coords, direction)
-    fail 'Off Grid' unless coord_on_board?(coords, direction)
+    fail 'Coordinates already occupied' if coords_in_use?(coords)
+    fail 'Off Grid' unless coord_on_board?(coords, size, direction)
     get_coords(coords, size, direction).each do |xy|
      placed_ships[xy] = ship
    end
     @placed_ships
   end
 
-  def coord_on_board?(coords, direction)
-    ((coords[0] <= 'j') && (coords[1..-1].to_i <= 10))
+  def coords_in_use?(coords)
+    placed_ships[coords] != nil
+  end
+
+  def coord_on_board?(coords, size, direction)
+    coord = get_coords(coords, size, direction).last
+    ((coord[0] <= 'j') && (coord[1..-1].to_i <= 10))
+
   end
 
   def fire(coord)
